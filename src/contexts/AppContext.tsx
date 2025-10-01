@@ -1,7 +1,8 @@
 import { createContext } from "react";
 
 interface AppContextType {
-  test: string;
+  isDarkTheme: boolean;
+  toggleDarkTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
