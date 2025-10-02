@@ -1,17 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import useGlobalContext from "../hooks/useGlobalContext";
+import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 
 interface UnsplashPhoto {
   id: string;
   alt_description?: string;
   urls: {
     regular: string;
+    small?: string;
+    thumb?: string;
   };
+  width: number;
+  height: number;
 }
 
 interface ApiResponse {
   results: UnsplashPhoto[];
+  total: number;
+  total_pages: number;
 }
 
 const url = `https://api.unsplash.com/search/photos?client_id=${
@@ -21,24 +28,25 @@ const url = `https://api.unsplash.com/search/photos?client_id=${
 const Gallery = () => {
   const { searchTerm } = useGlobalContext();
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, error } = useQuery<ApiResponse, Error>({
     queryKey: ["images", searchTerm],
     queryFn: async (): Promise<ApiResponse> => {
       const result = await axios.get(`${url}&query=${searchTerm}`);
       return result.data;
     },
+    staleTime: 5 * 60 * 1000,
   });
   if (isLoading) {
     return (
       <section className="image-container">
-        <h4>Loading...</h4>
+        <div className="loading"></div>
       </section>
     );
   }
   if (isError) {
     return (
       <section className="image-container">
-        <h4>There was an Error...</h4>
+        <h4>Error:{error?.message || "Failed to fetch images"}</h4>
       </section>
     );
   }
@@ -47,24 +55,32 @@ const Gallery = () => {
   if (results.length < 1) {
     return (
       <section className="image-container">
-        <h4>No results found...</h4>
+        <h4>No results found for "{searchTerm}"</h4>
       </section>
     );
   }
 
   return (
     <section className="image-container">
-      {results.map((item) => {
-        const url = item?.urls?.regular;
-        return (
-          <img
-            src={url}
-            key={item.id}
-            alt={item.alt_description}
-            className="img"
-          ></img>
-        );
-      })}
+      <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
+        <Masonry gutter="1rem">
+          {results.map((item) => {
+            const url = item?.urls?.regular;
+            return (
+              <div key={item.id} className="masonry-grid-item">
+                <img
+                  src={url}
+                  alt={item.alt_description || `Unsplash image by ${item.id}`}
+                  className="img"
+                  width={item.width}
+                  height={item.height}
+                  loading="lazy"
+                />
+              </div>
+            );
+          })}
+        </Masonry>
+      </ResponsiveMasonry>
     </section>
   );
 };
