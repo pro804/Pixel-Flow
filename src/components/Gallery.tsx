@@ -31,7 +31,7 @@ const Gallery = () => {
   const { data, isLoading, isError, error } = useQuery<ApiResponse, Error>({
     queryKey: ["images", searchTerm],
     queryFn: async (): Promise<ApiResponse> => {
-      const result = await axios.get(`${url}&query=${searchTerm}`);
+      const result = await axios.get(`${url}&query=${searchTerm}&per_page=30`);
       return result.data;
     },
     staleTime: 5 * 60 * 1000,
@@ -63,7 +63,7 @@ const Gallery = () => {
   return (
     <section className="image-container">
       <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
-        <Masonry gutter="1rem">
+        <Masonry>
           {results.map((item) => {
             const url = item?.urls?.regular;
             return (

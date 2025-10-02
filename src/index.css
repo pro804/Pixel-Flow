@@ -452,6 +452,7 @@ Gallery Styles
   border-radius: var(--borderRadius);
   overflow: hidden;
   transition: var(--transition);
+  margin: 0.3rem;
 }
 
 .masonry-grid-item .img {
