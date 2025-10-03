@@ -13,6 +13,12 @@ interface UnsplashPhoto {
   };
   width: number;
   height: number;
+  user: {
+    name: string;
+    links: {
+      html: string;
+    };
+  };
 }
 
 interface ApiResponse {
@@ -65,6 +71,7 @@ const Gallery = () => {
       <ResponsiveMasonry columnsCountBreakPoints={{ 350: 1, 750: 2, 900: 3 }}>
         <Masonry>
           {results.map((item) => {
+            console.log(item);
             const url = item?.urls?.regular;
             return (
               <div key={item.id} className="masonry-grid-item">
@@ -76,6 +83,17 @@ const Gallery = () => {
                   height={item.height}
                   loading="lazy"
                 />
+                <div className="photo-attribution">
+                  Photo by{"  "}
+                  <a
+                    href={item.user.links.html}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {item.user.name}
+                  </a>
+                  {"  "}on Unsplash
+                </div>
               </div>
             );
           })}
